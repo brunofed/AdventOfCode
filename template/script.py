@@ -41,13 +41,15 @@ def problem1(input):
 def problem2(input):
     pass
 
-for filename in ['input_example',
-                 'input']:
-    inputs_str = read(filename)
-    input = parse_input_str(inputs_str)
 
-    expected_result1 = None if filename == "input_example" else None
-    assert problem1(input) == expected_result1
-    expected_result2 = None if filename == "input_example" else None
-    assert problem2(input) == expected_result2
-pass
+if __name__ == '__main__':
+    for filename in ['input_example',
+                    'input']:
+        inputs_str = read(filename)
+        input = parse_input_str(inputs_str)
+
+        expected_result1 = None if filename == "input_example" else None
+        assert problem1(input) == expected_result1
+        expected_result2 = None if filename == "input_example" else None
+        assert problem2(input) == expected_result2
+    pass
