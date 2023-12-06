@@ -1,21 +1,23 @@
-#import stuff
+# import stuff
 from os.path import dirname, realpath, join
 from csv import reader
 from json import loads
 
-#actual math stuff
+# actual math stuff
 import numpy as np
 from dataclasses import dataclass
 from itertools import pairwise
 from typing import NamedTuple
+
 # from collections import Counter
 # import math
 # import pandas as pd
 
+
 def read(filename, blank_rows=False, rows_with_spaces=False, dir_path=None):
     if dir_path is None:
         dir_path = dirname(realpath(__file__))
-    with open(join(dir_path, f'{filename}.txt'), 'r') as file:
+    with open(join(dir_path, f"{filename}.txt"), "r") as file:
         if blank_rows:
             grouped_rows = [[]]
             idx = 0
@@ -31,20 +33,32 @@ def read(filename, blank_rows=False, rows_with_spaces=False, dir_path=None):
             return [line.rstrip() for line in lines]
         return [row[0] for row in reader(file)]
 
+
+def apply(func, args):
+    return list(map(func, args))
+
+
+def str_to_ints(string, start_idx=0, spaces_are_meaningful=True):
+    if spaces_are_meaningful:
+        return apply(int, string.split()[start_idx:])
+    return int(string.replace(" ", "").split(":")[-1])  # only one number
+
+
 def parse_input_str(inputs_str):
     for row in inputs_str:
         pass
 
+
 def problem1(input):
     pass
+
 
 def problem2(input):
     pass
 
 
-if __name__ == '__main__':
-    for filename in ['input_example',
-                    'input']:
+if __name__ == "__main__":
+    for filename in ["input_example", "input"]:
         inputs_str = read(filename)
         input = parse_input_str(inputs_str)
 
