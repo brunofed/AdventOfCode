@@ -1,10 +1,12 @@
 #import stuff
 from os.path import dirname, realpath, join
 from csv import reader
-from operator import add
 #actual math stuff
 from itertools import batched
-    
+
+def apply(func, args):
+    return list(map(func, args))
+
 def create_mapping(src_to_dest_mappings):
     def f(n):
         for dest_range_start, src_range_start, range_length in src_to_dest_mappings:
@@ -34,7 +36,7 @@ def read(filename, blank_rows=False, rows_with_spaces=False, dir_path=None):
         return [row[0] for row in reader(file)]
 
 def str_to_ints(string):
-    return list(map(int, string.split()))
+    return apply(int, string.split())
 
 def parse_input_str(inputs_str):
     mappings = []
@@ -54,17 +56,19 @@ def problem1(input):
     seeds, mappings = input
     transformed_seeds = seeds
     for f in mappings:
-        transformed_seeds = list(map(f, transformed_seeds))
+        transformed_seeds = apply(f, transformed_seeds)
     return min(transformed_seeds)
+
+def optimized_problem1(input):
+    seeds, mappings = input
 
 def problem2(input):
     seed_ranges, mappings = input
     assert len(seed_ranges) % 2 == 0 # apparently they come in pairs
-    starts_and_ends = batched(seed_ranges, 2)
+    starts_and_lengths = batched(seed_ranges, 2)
     seeds = []
-    for start, length in starts_and_ends:
-        actual_range = list(range(start, start+length))
-        seeds += actual_range
+    for start, length in starts_and_lengths:
+        seeds += list(range(start, start + length))
     return problem1((seeds, mappings))
 
 for filename in ['input_example',
