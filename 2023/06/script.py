@@ -47,23 +47,13 @@ def solve_second_degree_equation(a, b, c):
     # roots of a*x^2 + b*x + c = 0
     if a == 0:
         raise ValueError(f"The first parameter is supposed to be the coefficient of x^2, found: {a}")
-    d = b**2 - 4 * a * c
-    roots = []
-    for sign in {1, -1}:
-        roots.append((-b + sign * sqrt(d)) / (2 * a))
-    return roots
+    return [(-b + sign * sqrt(b**2 - 4 * a * c)) / (2 * a) for sign in {1, -1}]
 
 
-def strict_ceil(x, integer_result=True):
+def strict_round(rounding_func, x, integer_result=True):
     if not integer_result:
         return x
-    return ceil(x) + 1 if x % 1 == 0 else ceil(x)
-
-
-def strict_floor(x, integer_result=True):
-    if not integer_result:
-        return x
-    return floor(x) - 1 if x % 1 == 0 else floor(x)
+    return rounding_func(x) + 1 if x % 1 == 0 else rounding_func(x)
 
 
 def solve_second_degree_inequality(a, b, c, integer_solutions=True):
@@ -72,8 +62,8 @@ def solve_second_degree_inequality(a, b, c, integer_solutions=True):
     roots.sort()
     r1, r2 = roots
     if a < 0:
-        return strict_ceil(r1, integer_solutions), strict_floor(r2, integer_solutions)
-    return (-inf, strict_floor(r1, integer_solutions)), (strict_ceil(r2, integer_solutions), inf)
+        return strict_round(ceil, r1, integer_solutions), strict_round(floor, r2, integer_solutions)
+    return (-inf, strict_round(floor, r1, integer_solutions)), (strict_round(ceil, r2, integer_solutions), inf)
 
 
 def problem(input):
