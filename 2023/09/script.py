@@ -2,6 +2,10 @@
 from os.path import dirname, realpath, join
 from csv import reader
 
+# actual math stuff
+import numpy as np
+from sympy import binomial
+
 
 def read(filename, blank_rows=False, rows_with_spaces=False, dir_path=None):
     if dir_path is None:
@@ -34,16 +38,24 @@ def str_to_ints(string, start_idx=0, spaces_are_meaningful=True):
 
 
 def parse_input_str(inputs_str):
-    for row in inputs_str:
-        pass
+    return [str_to_ints(row) for row in inputs_str]
 
 
-def problem1(input):
-    pass
-
-
-def problem2(input):
-    pass
+def problem(input, reverse=False):
+    if reverse:
+        input = [numbers[::-1] for numbers in input]
+    total = 0
+    for numbers in input:
+        diff_rows = [np.array(numbers)]
+        while True:
+            new_row = np.diff(diff_rows[-1])
+            diff_rows.append(np.array(new_row))
+            if np.all(np.isin(new_row, new_row[0])):
+                break  # row is constant
+        n = len(numbers)  # the index of the place after the last element of numbers
+        # for the following formula, google "Mathologer what comes next Newton" and go to 16:03
+        total += sum(row[0] * binomial(n, k) for k, row in enumerate(diff_rows))
+    return total
 
 
 if __name__ == "__main__":
@@ -51,8 +63,8 @@ if __name__ == "__main__":
         inputs_str = read(filename)
         input = parse_input_str(inputs_str)
 
-        expected_result1 = None if filename == "input_example" else None
-        assert problem1(input) == expected_result1
-        expected_result2 = None if filename == "input_example" else None
-        assert problem2(input) == expected_result2
+        expected_result1 = 114 if filename == "input_example" else 1819125966
+        assert problem(input) == expected_result1
+        expected_result2 = 2 if filename == "input_example" else 1140
+        assert problem(input, True) == expected_result2
     pass
