@@ -44,16 +44,7 @@ def split_string(input_string):
             result.append(char)
         else:
             result[-1] += char
-
-    # for i in range(1, len(input_string)):
-    #     if input_string[i] != input_string[i - 1]:
-    #         result.append(input_string[i])
-    #     else:
-    #         # If the character is the same as the previous one, concatenate to the last element in result
-    #         result[-1] += input_string[i]
-
     return result
-    assert split_string("abccdddeeeeffff") == ["a", "b", "cc", "ddd", "eeee", "ffff"]
 
 
 def parse_input_str(inputs_str):
@@ -75,9 +66,8 @@ def base_case(springs, numbers):
     # by padded springs I mean: ### becomes ###. since every streak of springs needs a . to be separated by the next streak
     num_stars = num_springs - (sum(numbers) + num_numbers - 1)
     assert num_stars >= 0
-    return binomial(
-        num_numbers + num_stars, num_numbers
-    )  # this in combinatorics is called a Composition, see wikipedia page
+    # the following in combinatorics is called a Composition, see wikipedia page
+    return binomial(num_numbers + num_stars, num_numbers)
 
 
 def problem1(input):
