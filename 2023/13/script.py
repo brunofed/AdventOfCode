@@ -100,13 +100,3 @@ if __name__ == "__main__":
         expected_result2 = 400 if filename == "input_example" else None
         assert problem2(store_results) == expected_result2
     pass
-
-    # analogous to commutator and associator
-
-    # for row1, row2 in zip(sliced_pattern, sliced_pattern[::-1]):
-    #     palindromator = len([char1 for char1, char2 in zip(row1, row2) if char1!=char2])
-    # #palindromator = len([char1 for char1, char2 in zip(sliced_pattern, sliced_pattern[::-1]) if char1 != char2])
-    # if quasi_symmetry and palindromator == 1:  # sliced_patter differs in exactly 1 place with its reverse
-    #     return i
-    # elif not quasi_symmetry and palindromator == 0:  # sliced_pattern is a palindrome
-    #     return i
