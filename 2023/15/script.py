@@ -1,6 +1,5 @@
 from os.path import dirname, realpath, join
 from csv import reader
-from collections import deque
 
 
 def read(filename, blank_rows=False, rows_with_spaces=False, dir_path=None):
@@ -24,50 +23,58 @@ def read(filename, blank_rows=False, rows_with_spaces=False, dir_path=None):
 
 
 def parse_input_str(inputs_str):
-    return inputs_str[0].split(",")
+    return [Lens(string) for string in inputs_str[0].split(",")]
+
+
+class Lens:
+    def __init__(self, string):
+        self.step = string
+        self.symbol = "-" if "-" in self.step else "="
+        self.name, focal_length_str = self.step.split(self.symbol)
+        self.focal_length = "" if not focal_length_str else int(focal_length_str)
+        self.clean_step = None if self.symbol == "-" else self.name + " " + focal_length_str
+
+    def __repr__(self):
+        string = self.clean_step if self.clean_step is not None else self.step
+        return f"Lens('{string}')"
+
+
+def hash(string):
+    current_value = 0
+    for char in string:
+        current_value = ((current_value + ord(char)) * 17) % 256
+    return current_value
 
 
 def problem1(input):
-    total = 0
-    for step in input:
-        current_value = 0
-        for char in step:
-            current_value = ((current_value + ord(char)) * 17) % 256
-        total += current_value
-    return total
+    return sum(hash(lens.step) for lens in input)
 
 
 def problem2(input):
     boxes = {i: [] for i in range(256)}
-    for step in input:
-        name, symbol, number_str = step[:2], step[2], step[3:]
-        clean_step = name + " " + number_str
-        if symbol == "-":
-            assert number_str == ""
-            for key, value in boxes.items():
-                new_value = [lens for lens in value if not lens.startswith(name)]
-                boxes[key] = new_value
-        else:
-            for key, value in boxes.items():
-                found = False
-                new_value = []
-                for lens in value:
-                    if lens.startswith(name):
-                        found = True
-                        new_value.append(clean_step)
-                    else:
-                        new_value.append(lens)
-                if found == False:
-                    new_value.insert(0, clean_step)
-                boxes[key] = new_value
     total = 0
-    for key, value in boxes.items():
-        for slot, lens in enumerate(value, start=1):
-            try:
-                focal_length = int(lens[3])
-            except:
-                raise ("something went wrong")
-            total += (key + 1) * slot * focal_length
+    for lens in input:
+        key = hash(lens.name)
+        old_value = boxes[key]
+        if lens.symbol == "-":
+            new_value = [old_lens for old_lens in old_value if old_lens.name != lens.name]
+        else:
+            found = False
+            new_value = []
+            for old_lens in old_value:
+                if old_lens.name == lens.name:
+                    found = True
+                    new_value.append(lens)
+                else:
+                    new_value.append(old_lens)
+            if found == False:
+                new_value.append(lens)
+
+        boxes[key] = new_value
+
+    for id, lenses in boxes.items():
+        for slot, lens in enumerate(lenses, start=1):
+            total += (id + 1) * slot * lens.focal_length
     return total
 
 
@@ -78,6 +85,6 @@ if __name__ == "__main__":
 
         expected_result1 = 1320 if filename == "input_example" else 516070
         assert problem1(input) == expected_result1
-        expected_result2 = None if filename == "input_example" else None
+        expected_result2 = 145 if filename == "input_example" else 244981
         assert problem2(input) == expected_result2
     pass
