@@ -1,4 +1,3 @@
-# import stuff
 from os.path import dirname, realpath, join
 from csv import reader
 
