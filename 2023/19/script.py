@@ -117,8 +117,8 @@ def problem1(input):
 
 def problem2(input):
     workflows, _ = input
+    # 1) rewrite the final condition of all workflows so it's still of the form "cond: workflow"
     for workflow in workflows.values():
-        # 1) rewrite the final condition so it's still of the form "cond: workflow"
         final_rule = workflow.rules[-1]
         standard_rules = workflow.rules[:-1]
         conditions = [rule.condition for rule in standard_rules]
