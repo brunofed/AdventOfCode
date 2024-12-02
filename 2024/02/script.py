@@ -45,16 +45,32 @@ def str_to_ints(string, start_idx=0, spaces_are_meaningful=True):
 
 
 def parse_input_str(inputs_str):
-    for row in inputs_str:
-        pass
+    list_of_rows = [np.array(apply(int, row.split())) for row in inputs_str]
+    return list_of_rows
+
+
+def condition(arr):
+    return np.all((1 <= arr) & (arr <= 3)) or np.all((-3 <= arr) & (arr <= -1))
 
 
 def problem1(input):
-    pass
+    diff = [np.diff(row) for row in input]
+    return sum(condition(arr) for arr in diff)
 
 
 def problem2(input):
-    pass
+    safe_rows = 0
+    for row in input:
+        if condition(row):
+            safe_rows += 1
+            continue
+        new_diffs = [np.diff(np.delete(row, i)) for i, _ in enumerate(row)]
+        for new_arr in new_diffs:
+            if condition(new_arr):
+                safe_rows += 1
+                break
+
+    return safe_rows
 
 
 if __name__ == "__main__":
@@ -62,8 +78,8 @@ if __name__ == "__main__":
         inputs_str = read(filename)
         input = parse_input_str(inputs_str)
 
-        expected_result1 = None if filename == "input_example" else None
+        expected_result1 = 2 if filename == "input_example" else 486
         assert problem1(input) == expected_result1
-        expected_result2 = None if filename == "input_example" else None
+        expected_result2 = 4 if filename == "input_example" else 540
         assert problem2(input) == expected_result2
     pass
