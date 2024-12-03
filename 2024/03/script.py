@@ -1,4 +1,5 @@
 import re
+from operator import mul
 from os.path import dirname, join, realpath
 
 
@@ -12,10 +13,6 @@ def parse_input_str(inputs_str, problem1):
     pattern1 = r"mul\(\d{1,3},\d{1,3}\)"
     pattern = pattern1 if problem1 else rf"(do\(\)|don't\(\)|{pattern1})"
     return re.findall(pattern, inputs_str)
-
-
-def mul(a, b):
-    return a * b
 
 
 def problem1(input):
