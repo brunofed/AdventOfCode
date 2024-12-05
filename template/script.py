@@ -1,23 +1,24 @@
-# import stuff
+import math
 from collections import Counter
 from csv import reader
 from dataclasses import dataclass
 from itertools import pairwise
 from json import loads
 from os.path import dirname, join, realpath
+from pathlib import Path
 from typing import NamedTuple
 
-# actual math stuff
 import numpy as np
-
-# import math
-# import pandas as pd
+import pandas as pd
 
 
-def read(filename, blank_rows=False, rows_with_spaces=False, dir_path=None):
-    if dir_path is None:
-        dir_path = dirname(realpath(__file__))
-    with open(join(dir_path, f"{filename}.txt"), "r") as file:
+def read(
+    filename,
+    blank_rows=False,
+    rows_with_spaces=False,
+):
+    file_path = Path(__file__).parent / f"{filename}.txt"
+    with open(file_path, "r") as file:
         if blank_rows:
             grouped_rows = [[]]
             idx = 0
