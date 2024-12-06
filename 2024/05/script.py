@@ -35,9 +35,9 @@ def apply(func, args):
 
 def parse_input_str(inputs_str):
     page_pairs_str, updates_str = inputs_str
-    page_pairs_list = [apply(int, pair.split("|")) for pair in page_pairs_str]
     page_pairs = defaultdict(list)
-    for a, b in page_pairs_list:
+    for pair in page_pairs_str:
+        a, b = apply(int, pair.split("|"))
         page_pairs[a].append(b)
     updates = [apply(int, update) for update in updates_str]
     return page_pairs, updates
