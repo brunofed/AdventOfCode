@@ -1,7 +1,7 @@
 from csv import reader
 from itertools import product
-from operator import add, mul
 from pathlib import Path
+from operator import add, mul
 from typing import NamedTuple
 
 
@@ -34,22 +34,29 @@ def concatenate(a: int, b: int):
 
 
 def can_be_solved(line, is_problem1):
+    # put faster operations before so that bigger numbers are reached earlier
     operators = [mul, add]
     if not is_problem1:
         operators = [concatenate] + operators
 
-    # put mul before add so that bigger numbers are reached earlier
-    sequences_of_operations = product(operators, repeat=len(line.numbers) - 1)
+    # small optimization: precalculate some variables
+    nums = line.numbers
+    initial_result = nums[0]
+    sequences_of_operations = product(operators, repeat=len(nums) - 1)
+    enum = enumerate(nums[1:])
+    test_n = line.test_num
+
+    # test all possible operations sequences
     for operations in sequences_of_operations:
-        result = line.numbers[0]
+        result = initial_result
         # apply all operations to result
-        for i, number in enumerate(line.numbers[1:]):
+        for i, number in enum:
             result = operations[i](result, number)
             # optimization: if the result is too big, there's no point in keep adding/multiplying numbers
-            if result > line.test_num:
+            if result > test_n:
                 break
         else:
-            if result == line.test_num:
+            if result == test_n:
                 return True
     return False
 
