@@ -1,17 +1,10 @@
-import math
-from collections import Counter
 from csv import reader
-from dataclasses import astuple, dataclass
-from itertools import pairwise
-from json import loads
-from os.path import dirname, join, realpath
+from dataclasses import dataclass
+from itertools import product
 from pathlib import Path
-from turtle import st
-from typing import ClassVar, NamedTuple
+from typing import ClassVar
 
 import numpy as np
-import pandas as pd
-from regex import P
 from tqdm import tqdm
 
 
@@ -36,16 +29,6 @@ def read(
             lines = file.readlines()
             return [line.rstrip() for line in lines]
         return [row[0] for row in reader(file)]
-
-
-def apply(func, args):
-    return list(map(func, args))
-
-
-def str_to_ints(string, start_idx=0, spaces_are_meaningful=True):
-    if spaces_are_meaningful:
-        return apply(int, string.split()[start_idx:])
-    return int(string.replace(" ", "").split(":")[-1])  # only one number
 
 
 @dataclass
@@ -96,10 +79,6 @@ class Particle:
         return tuple(self.position), tuple(self.momentum)
 
 
-def is_in(v, l):  # stupid numpy that does not have a "in" function
-    return list(v) in [list(x) for x in l]
-
-
 def plot(p, map, visited_positions, is_problem1=False):
     map_with_p = map.copy()
     for position in visited_positions:
@@ -121,20 +100,23 @@ def swap(t):
     return t[1], t[0]
 
 
-def navigate(map, is_problem1=False):
+def navigate(map, is_problem1=False, should_plot=False):
     starting_position = swap(np.argwhere(map == "^")[0])
     p = Particle(starting_position, CONSTANTS.UP)
     map[starting_position] = "."  # clean map from '^'
     visited_positions = {starting_position} if is_problem1 else {p.to_tuple()}
+    n, m = map.shape
     while True:
-        # plot(p, map, visited_positions, is_problem1=is_problem1)
+        if should_plot:
+            plot(p, map, visited_positions, is_problem1=is_problem1)
         new_position = tuple(p.position + p.momentum)
-        try:
-            new_tile = map[swap(new_position)]
-        except IndexError:  # out of map
+        is_within_bound = 0 <= new_position[0] < n and 0 <= new_position[1] < m
+        if not is_within_bound:
             if not is_problem1:
                 return False  # we left the map, so it's not a loop
             break
+        new_tile = map[swap(new_position)]
+
         if new_tile in ["#", "O"]:
             p.rotate_direction("R")
         else:
@@ -147,22 +129,28 @@ def navigate(map, is_problem1=False):
                     return True  # we found a loop
                 visited_positions.add(item)
     if is_problem1:
-        return len(visited_positions)
+        return visited_positions
 
 
 def problem1(map):
-    return navigate(map, is_problem1=True)
+    visited_positions = navigate(map, is_problem1=True)
+    return len(visited_positions), visited_positions
 
 
-def problem2(map):
+def problem2(map, visited_positions, input_example=True):
     loops_found = 0
-    for (i, j), tile in tqdm(np.ndenumerate(map), desc="Processing", unit="step"):
-        # test if placing a O on the tile would create a loop
+
+    for coordinates, tile in tqdm(np.ndenumerate(map)):
+
         if tile in ["#", "^"]:
             continue
+        # only changing a visited position can influence the path
+        if coordinates not in visited_positions:
+            continue
         map_copy = map.copy()
-        map_copy[i, j] = "O"
-        loops_found += navigate(map_copy, is_problem1=False)
+        # test if placing a O on the tile would create a loop
+        map_copy[*coordinates] = "O"
+        loops_found += navigate(map_copy, is_problem1=False, should_plot=input_example)
     return loops_found
 
 
@@ -172,7 +160,8 @@ if __name__ == "__main__":
         input = parse_input_str(inputs_str)
 
         expected_result1 = 41 if filename == "input_example" else 5404
-        # assert problem1(input) == expected_result1
+        result, visited_positions = problem1(input)
+        assert result == expected_result1
         expected_result2 = 6 if filename == "input_example" else None
-        assert problem2(input) == expected_result2
+        assert problem2(input, visited_positions) == expected_result2
     pass
