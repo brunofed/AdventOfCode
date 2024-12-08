@@ -1,5 +1,5 @@
 import math
-from collections import Counter
+from collections import Counter, defaultdict
 from csv import reader
 from dataclasses import dataclass
 from itertools import pairwise
