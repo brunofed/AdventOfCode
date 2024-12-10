@@ -8,6 +8,7 @@ from os.path import dirname, join, realpath
 from pathlib import Path
 from typing import NamedTuple
 
+import networkx as nx
 import numpy as np
 import pandas as pd
 
@@ -35,7 +36,7 @@ def read(
         return [row[0] for row in reader(file)]
 
 
-def apply(func, args):
+def apply(args, func=int):
     return list(map(func, args))
 
 
@@ -43,6 +44,10 @@ def str_to_ints(string, start_idx=0, spaces_are_meaningful=True):
     if spaces_are_meaningful:
         return apply(int, string.split()[start_idx:])
     return int(string.replace(" ", "").split(":")[-1])  # only one number
+
+
+def is_within_bounds(coords, bounds):
+    return all(0 <= coords[i] < bounds[i] for i in [0, 1])
 
 
 def parse_input_str(inputs_str):
