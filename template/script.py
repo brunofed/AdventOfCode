@@ -13,7 +13,13 @@ import numpy as np
 import pandas as pd
 
 
-def read(
+def read(filename):
+    file_path = Path(__file__).parent / f"{filename}.txt"
+    with open(file_path, "r") as file:
+        return [row[0] for row in reader(file)]
+
+
+def advanced_read(
     filename,
     blank_rows=False,
     rows_with_spaces=False,

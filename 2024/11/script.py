@@ -40,12 +40,12 @@ def problem(inputs, blinks):
 
 
 if __name__ == "__main__":
-    for filename in ["input_example2", "input_example1", "input"]:
+    for filename in ["input_example1", "input_example2", "input"]:
         inputs_str = read(filename)
         input = parse_input_str(inputs_str)
 
-        expected_result1 = {"input_example1": 55312, "input_example2": 7, "input": 233875}
-        blinks = {"input_example1": 25, "input_example2": 1, "input": 25}
+        expected_result1 = {"input_example1": 7, "input_example2": 55312, "input": 233875}
+        blinks = {"input_example1": 1, "input_example2": 25, "input": 25}
         assert problem(input, blinks[filename]) == expected_result1[filename]
         if filename == "input":
             assert problem(input, blinks=75) == 277444936413293
