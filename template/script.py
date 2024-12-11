@@ -72,10 +72,10 @@ def problem2(input):
 if __name__ == "__main__":
     for filename in ["input_example", "input"]:
         inputs_str = read(filename)
-        input = parse_input_str(inputs_str)
+        inputs = parse_input_str(inputs_str)
 
         expected_result1 = None if filename == "input_example" else None
-        assert problem1(input) == expected_result1
+        assert problem1(inputs) == expected_result1
         expected_result2 = None if filename == "input_example" else None
-        assert problem2(input) == expected_result2
+        assert problem2(inputs) == expected_result2
     pass
