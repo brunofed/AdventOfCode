@@ -61,11 +61,11 @@ def parse_input_str(inputs_str):
         pass
 
 
-def problem1(input):
+def problem1(inputs):
     pass
 
 
-def problem2(input):
+def problem2(inputs):
     pass
 
 
