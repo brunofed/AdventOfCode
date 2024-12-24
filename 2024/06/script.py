@@ -75,11 +75,15 @@ class Particle:
     def rotate_direction(self, left_or_right):
         self.momentum = np.dot(CONSTANTS.ROTATIONS[left_or_right], self.momentum)
 
-    def to_tuple(self):
+    def hash(self, is_problem1):
+        if is_problem1:
+            return tuple(self.position)
         return tuple(self.position), tuple(self.momentum)
 
 
-def plot(p, map, visited_positions, is_problem1=False):
+def plot(p, map, visited_positions, is_problem1=False, should_plot=False):
+    if not should_plot:
+        return
     map_with_p = map.copy()
     for position in visited_positions:
         pos = position if is_problem1 else position[0]
@@ -100,68 +104,70 @@ def swap(t):
     return t[1], t[0]
 
 
-def navigate(map, is_problem1=False, should_plot=False):
-    starting_position = swap(np.argwhere(map == "^")[0])
+def navigate(map, starting_position, is_problem1=False, should_plot=False):
     p = Particle(starting_position, CONSTANTS.UP)
     map[starting_position] = "."  # clean map from '^'
-    visited_positions = {starting_position} if is_problem1 else {p.to_tuple()}
+    visited_positions = {starting_position} if is_problem1 else {p.hash(is_problem1)}
     n, m = map.shape
     while True:
-        if should_plot:
-            plot(p, map, visited_positions, is_problem1=is_problem1)
+        plot(p, map, visited_positions, is_problem1, should_plot)
         new_position = tuple(p.position + p.momentum)
         is_within_bound = 0 <= new_position[0] < n and 0 <= new_position[1] < m
-        if not is_within_bound:
-            if not is_problem1:
-                return False  # we left the map, so it's not a loop
-            break
+        if not is_within_bound:  # we left the map
+            if is_problem1:
+                break
+            return False  # ...so it's not a loop
         new_tile = map[swap(new_position)]
 
         if new_tile in ["#", "O"]:
             p.rotate_direction("R")
-        else:
-            p.position = new_position
-            if is_problem1:
-                visited_positions.add(new_position)
-            else:
-                item = p.to_tuple()
-                if item in visited_positions:
-                    return True  # we found a loop
-                visited_positions.add(item)
+            continue
+        p.position = new_position
+        item = p.hash(is_problem1)
+        if is_problem1:
+            visited_positions.add(item)
+            continue
+        plot(p, map, visited_positions, is_problem1, should_plot)
+        return True  # we found a loop
+    plot(p, map, visited_positions, is_problem1, should_plot)
     if is_problem1:
-        return visited_positions
+        return visited_positions.copy()
 
 
-def problem1(map):
-    visited_positions = navigate(map, is_problem1=True)
-    return len(visited_positions), visited_positions
+def problem1(map, starting_position):
+    visited_positions_problem1 = navigate(map, starting_position, is_problem1=True)
+    return len(visited_positions_problem1), visited_positions_problem1
 
 
-def problem2(map, visited_positions, input_example=True):
+def problem2(map, starting_position, visited_positions_problem1, should_plot):
     loops_found = 0
-
     for coordinates, tile in tqdm(np.ndenumerate(map)):
-
+        map_copy = map.copy()
         if tile in ["#", "^"]:
             continue
         # only changing a visited position can influence the path
-        if coordinates not in visited_positions:
+        if coordinates not in visited_positions_problem1:
             continue
-        map_copy = map.copy()
         # test if placing a O on the tile would create a loop
-        map_copy[*coordinates] = "O"
-        loops_found += navigate(map_copy, is_problem1=False, should_plot=input_example)
+        map_copy[swap(coordinates)] = "O"
+        loops_found += navigate(
+            map_copy, starting_position, is_problem1=False, should_plot=should_plot
+        )
     return loops_found
 
 
 if __name__ == "__main__":
     for filename in ["input_example", "input"]:
         inputs_str = read(filename)
-        input = parse_input_str(inputs_str)
+        inputs = parse_input_str(inputs_str)
 
+        starting_position = swap(np.argwhere(inputs == "^")[0])
         expected_result1 = 41 if filename == "input_example" else 5404
-        result, visited_positions = problem1(input)
+        result, visited_positions_problem1 = problem1(inputs, starting_position)
         assert result == expected_result1
-        expected_result2 = 6 if filename == "input_example" else None
-        assert problem2(input, visited_positions) == expected_result2
+        expected_result2 = 6 if filename == "input_example" else None  # obtained 1899 but was wrong
+        assert (
+            problem2(inputs, starting_position, visited_positions_problem1, should_plot=False)
+            == expected_result2
+        )
     pass
