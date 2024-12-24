@@ -23,39 +23,33 @@ def read(
         return [row[0] for row in reader(file)]
 
 
-def apply(func, args):
-    return list(map(func, args))
-
-
 @dataclass
 class Wire:
     name: str
     value: bool | None = None
 
 
-OPERATOR_DICT = {"AND": and_, "OR": or_, "XOR": xor}
-
-
 def parse_input_str(inputs_str):
     initial_values, gates_str = inputs_str
 
-    initialised_wires = []
+    wires = []
     for initial_value in initial_values:
         string, value = initial_value.split(": ")
         wire = Wire(string, bool(int(value)))
-        initialised_wires.append(wire)
+        wires.append(wire)
 
+    OPERATOR_DICT = {"AND": and_, "OR": or_, "XOR": xor}
     gates = []
     for gate_str in gates_str:
         wire1, op, wire2, _, wire_result = gate_str.split()
         gates.append((wire1, OPERATOR_DICT[op], wire2, wire_result))
-    return initialised_wires, gates
+    return wires, gates
 
 
-def convert_z_values(wires):
-    z_wires = [wire for wire in wires if wire.name.startswith("z")]
-    z_wires.sort(key=lambda wire: wire.name)
-    bool_list = [wire.value for wire in z_wires[::-1]]
+def values_to_int(wires, first_letter):
+    chosen_wires = [wire for wire in wires if wire.name.startswith(first_letter)]
+    chosen_wires.sort(key=lambda wire: wire.name)
+    bool_list = [wire.value for wire in chosen_wires[::-1]]  # reverse the list to put 00 at the rightmost place
     return int("".join(str(int(b)) for b in bool_list), 2)
 
 
@@ -85,7 +79,7 @@ def problem1(wires, gates):
             wire_result.value = op(value1, value2)
         if all(wire.value is not None for wire in wires):
             break
-    return convert_z_values(wires)
+    return values_to_int(wires, "z")
 
 
 def problem2(input):
