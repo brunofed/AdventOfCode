@@ -57,23 +57,46 @@ def is_within_bounds(coords, bounds):
 
 
 def parse_input_str(inputs_str):
+    results = []
+    sign_dict = {"L": -1, "R": 1}
     for row in inputs_str:
-        pass
+        sign, num = row[0], row[1:]
+        results.append(sign_dict[sign] * int(num))
+    return results
 
 
 def problem1(inputs):
-    pass
+    current = 50
+    num_of_zeroes = 0
+    for num in inputs:
+        current = (current + num) % 100
+        if current == 0:
+            num_of_zeroes += 1
+    return num_of_zeroes
 
 
 def problem2(inputs):
-    pass
+    current = 50
+    num_of_zeroes = 0
+    for num in inputs:
+        assert 0 <= current < 100
+        sum = current + num
+        if not (0 <= sum <= 100):
+            if sum > 0:
+                num_of_zeroes += sum // 100
+            else:
+                num_of_zeroes += (-sum // 100) + 1 if current != 0 else -sum // 100
+        current = sum % 100
+        if current % 100 == 0:
+            num_of_zeroes += 1
+    return num_of_zeroes
 
 
 if __name__ == "__main__":
     expected_results = {
-        (problem1, "input_example"): None,
-        (problem1, "input"): None,
-        (problem2, "input_example"): None,
+        (problem1, "input_example"): 3,
+        (problem1, "input"): 1066,
+        (problem2, "input_example"): 6,
         (problem2, "input"): None,
     }
     for filename in ["input_example", "input"]:
