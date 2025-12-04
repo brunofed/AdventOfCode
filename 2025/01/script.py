@@ -65,11 +65,14 @@ def parse_input_str(inputs_str):
     return results
 
 
+SIZE = 100
+
+
 def problem1(inputs):
     current = 50
     num_of_zeroes = 0
     for num in inputs:
-        current = (current + num) % 100
+        current = (current + num) % SIZE
         if current == 0:
             num_of_zeroes += 1
     return num_of_zeroes
@@ -79,16 +82,28 @@ def problem2(inputs):
     current = 50
     num_of_zeroes = 0
     for num in inputs:
-        assert 0 <= current < 100
-        sum = current + num
-        if not (0 <= sum <= 100):
-            if sum > 0:
-                num_of_zeroes += sum // 100
-            else:
-                num_of_zeroes += (-sum // 100) + 1 if current != 0 else -sum // 100
-        current = sum % 100
-        if current % 100 == 0:
+        assert 0 <= current < SIZE
+        if current == num == 0:
             num_of_zeroes += 1
+            continue
+        next = current + num
+        # transform the interval (current, next] to the interval I = (0, |num|] by the transformation sign(num)*(x-current)
+        # and then count the size of the intersection of I with A = {a + SIZE*n}, where a = -current (mod SIZE)
+        # this intersection has the same size as [a, |num|] intersected with A
+        # which is (|num| - a) // SIZE
+        a = (-current) % SIZE
+        num_of_zeroes += (abs(num) - a) // SIZE
+
+        # # 1) non-boundary case
+        # if current % SIZE and next % SIZE:  # start and end are not multiples of SIZE
+        #     num_of_zeroes += abs(next // SIZE)
+        # # 2) boundary case
+        # elif not current % SIZE and next % SIZE:
+        #     num_of_zeroes += abs(next // SIZE)
+        # # 3) problem 1 case
+        # elif next % SIZE == 0:
+        #     num_of_zeroes += 1
+        current = next % SIZE
     return num_of_zeroes
 
 
