@@ -90,5 +90,5 @@ if __name__ == "__main__":
             expected_result = expected_results[(problem, filename)]
             assert (
                 actual_result == expected_result
-            ), f"{problem.__name__},  {filename=}, {actual_result=}, {expected_result=}"
+            ), f"{problem.__name__},  {filename=}, {expected_result=}, {actual_result=}"
     pass
