@@ -82,28 +82,17 @@ def problem2(inputs):
     current = 50
     num_of_zeroes = 0
     for num in inputs:
-        assert 0 <= current < SIZE
-        if current == num == 0:
+        # increase counter every time we cross 0 or land on it
+        steps = abs(num)
+        if num < 0:
+            if current - steps < 0:
+                num_of_zeroes += 1 + (steps - current - 1) // SIZE
+        else:
+            if current + steps > SIZE:
+                num_of_zeroes += 1 + (steps - (SIZE - current) - 1) // SIZE
+        current = (current + num) % SIZE
+        if current == 0:
             num_of_zeroes += 1
-            continue
-        next = current + num
-        # transform the interval (current, next] to the interval I = (0, |num|] by the transformation sign(num)*(x-current)
-        # and then count the size of the intersection of I with A = {a + SIZE*n}, where a = -current (mod SIZE)
-        # this intersection has the same size as [a, |num|] intersected with A
-        # which is (|num| - a) // SIZE
-        a = (-current) % SIZE
-        num_of_zeroes += (abs(num) - a) // SIZE
-
-        # # 1) non-boundary case
-        # if current % SIZE and next % SIZE:  # start and end are not multiples of SIZE
-        #     num_of_zeroes += abs(next // SIZE)
-        # # 2) boundary case
-        # elif not current % SIZE and next % SIZE:
-        #     num_of_zeroes += abs(next // SIZE)
-        # # 3) problem 1 case
-        # elif next % SIZE == 0:
-        #     num_of_zeroes += 1
-        current = next % SIZE
     return num_of_zeroes
 
 
